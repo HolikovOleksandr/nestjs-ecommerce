@@ -4,8 +4,8 @@ import {
   Post,
   Body,
   Patch,
-  Param,
   Delete,
+  Param,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { SignupUserDto } from './dto/signup-user.dto';
@@ -30,5 +30,15 @@ export class UsersController {
     const token = this.usersService.getAccessToken(user);
 
     return { token, user };
+  }
+
+  @Get('all')
+  async findAll(): Promise<UserEntity[]> {
+    return await this.usersService.findAll();
+  }
+
+  @Get('single/:id')
+  async findOne(@Param('id') id: string): Promise<UserEntity> {
+    return await this.usersService.findOne(+id);
   }
 }
