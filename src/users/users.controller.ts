@@ -10,33 +10,25 @@ import {
 import { UsersService } from './users.service';
 import { SignupUserDto } from './dto/signup-user.dto';
 import { UserEntity } from './entities/user.entity';
+import { SigninUserDto } from './dto/signin-user.dto';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post('signup')
-  async create(@Body() user: SignupUserDto): Promise<{ user: UserEntity }> {
-    return { user: await this.usersService.signup(user) };
+  async create(@Body() userData: SignupUserDto): Promise<{ user: UserEntity }> {
+    return { user: await this.usersService.signup(userData) };
   }
 
-  @Get()
-  findAll() {
-    return this.usersService.findAll();
-  }
+  @Post('signin')
+  async signin(@Body() userData: SigninUserDto): Promise<{
+    token: string;
+    user: UserEntity;
+  }> {
+    const user = await this.usersService.signin(userData);
+    const token = this.usersService.getAccessToken(user);
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: any) {
-    return this.usersService.update(+id, updateUserDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+    return { token, user };
   }
 }
