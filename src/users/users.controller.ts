@@ -1,16 +1,9 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Delete,
-  Param,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Param } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { SignupUserDto } from './dto/signup-user.dto';
 import { UserEntity } from './entities/user.entity';
 import { SigninUserDto } from './dto/signin-user.dto';
+import { CurrentUser } from 'src/utility/decorators/current-user.decorator';
 
 @Controller('users')
 export class UsersController {
@@ -18,6 +11,9 @@ export class UsersController {
 
   @Post('signup')
   async create(@Body() userData: SignupUserDto): Promise<{ user: UserEntity }> {
+    const token = this.usersService.getAccessToken(userData as UserEntity);
+    console.log(token);
+
     return { user: await this.usersService.signup(userData) };
   }
 
@@ -40,5 +36,10 @@ export class UsersController {
   @Get('single/:id')
   async findOne(@Param('id') id: string): Promise<UserEntity> {
     return await this.usersService.findOne(+id);
+  }
+
+  @Get('me')
+  getCurrentUser(@CurrentUser() user: UserEntity): UserEntity {
+    return user;
   }
 }
