@@ -19,6 +19,7 @@ export class CurrentUserMiddleware implements NestMiddleware {
 
   async use(req: Request, res: Response, next: NextFunction) {
     const header = req.headers.authorization || req.headers.Authorization;
+
     if (!header || isArray(header) || !header.startsWith('Bearer ')) {
       req.currentUser = null;
       next();
