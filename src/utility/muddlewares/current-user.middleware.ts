@@ -33,8 +33,8 @@ export class CurrentUserMiddleware implements NestMiddleware {
         const currentUser = await this.usersService.findOne(+id);
         req.currentUser = currentUser;
         next();
+        return;
       } catch (err) {
-        console.log(err);
         req.currentUser = null;
         next();
       }

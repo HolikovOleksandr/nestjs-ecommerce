@@ -1,9 +1,12 @@
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { SignupUserDto } from './dto/signup-user.dto';
 import { UserEntity } from './entities/user.entity';
 import { SigninUserDto } from './dto/signin-user.dto';
 import { CurrentUser } from 'src/utility/decorators/current-user.decorator';
+import { AuthenticationGuard } from 'src/utility/guards/authentication.guard';
+import { AutorizeRoles } from 'src/utility/decorators/autorize-roles.decorator';
+import { Roles } from 'src/utility/common/user-roles.enum';
 
 @Controller('users')
 export class UsersController {
@@ -28,6 +31,8 @@ export class UsersController {
     return { token, user };
   }
 
+  @AutorizeRoles(Roles.ADMIN)
+  @UseGuards(AuthenticationGuard, AuthenticationGuard)
   @Get('all')
   async findAll(): Promise<UserEntity[]> {
     return await this.usersService.findAll();
@@ -38,8 +43,9 @@ export class UsersController {
     return await this.usersService.findOne(+id);
   }
 
+  @UseGuards(AuthenticationGuard)
   @Get('me')
-  getCurrentUser(@CurrentUser() user: UserEntity): UserEntity {
-    return user;
+  getCurrentUser(@CurrentUser() currentUser: UserEntity): UserEntity {
+    return currentUser;
   }
 }
